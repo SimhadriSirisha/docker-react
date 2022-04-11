@@ -1,0 +1,24 @@
+FROM node:16-alpine
+
+USER node
+
+RUN mkdir -p /home/node/app
+# Docker node image includes a non-root node user, which we can use to avoid running 
+# application as root. For security pupise we can make use of node user which is not root use
+# by creating a directory /home/node/app ensures we have the permission, in addition to this
+# we have set ownership as node user to this directory
+WORKDIR '/home/node/app'
+
+# copying both package.json & package-lock.json (COPY packagez*.json ./)
+# When using COPY with more than one source file, the destination must be a directory and end with a /
+# we have used this before bcz if any change is made to package.json then the layer will rebuilt,
+# but if we dont we skip reinstalling node_modules & can use cache.
+COPY --chown=node:node ./package.json ./
+RUN npm install
+
+# copying local files with appropriate permission
+# it will work fine with having COPY instruct, but its good to have this cmd 
+# as in future if we dont have dockercompose at that time this copy cmd helps 
+COPY --chown=node:node ./ ./
+
+CMD ["npm","run","start"]

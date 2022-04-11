@@ -1,0 +1,24 @@
+version: '3'
+# services are the one which docker will create container of it
+services:
+    # it can be any name (web/rect-app,xyz)
+    web:
+        build: 
+            # context specifies from the files to be included, for our case curr working dir 
+          context: .
+          dockerfile: Dockerfile.dev
+        ports:
+            - "3000:3000"
+        volumes:
+            - /home/node/app/node_modules
+            # dot(.) is current working dir
+            - .:/home/node/app 
+    tests:
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        volumes:
+            - /home/node/app/node_modules
+            - .:/home/node/app
+        # entry command
+        command: ["npm", "run", "test"]
